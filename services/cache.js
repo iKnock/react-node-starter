@@ -13,8 +13,7 @@ const exec = mongoose.Query.prototype.exec;
 //we add our logic in to the original function
 //notice the use of function key word not the arrow function. which is because we need
 //to use this key word, this in this case refer to Query object
-mongoose.Query.prototype.exec = function () {
-    console.log('Im about to RUN a QUERY');
+mongoose.Query.prototype.exec = async function () {
     //this is used to safely copy properties from one object to the other and stringified to use for redis
     const key = JSON.stringify(Object.assign({}, this.getQuery(), {
         collection: this.mongooseCollection.name
@@ -24,36 +23,20 @@ mongoose.Query.prototype.exec = function () {
 
     const cacheValue = await client.get(key);
 
-    //If we do return that 
-
+    //If yes do return the cachedValue
+    //the exec function must always return a mongoose document (Model instances)
+    if (cacheValue) {
+        const doc = new this.model(JSON.parse(cacheValue))
+        return doc;
+    }
 
     //otherwise, issue the query and store the result in redis
-
-    console.log(key);
-
     //this is to run the original exec function, we use apply to pass in automatically any arguments that are passed to exec as well
-    return exec.apply(this, arguments);
+    const result = await exec.apply(this, arguments);
+
+    //since redis only accept string make sure to stringify it before
+    client.set(key, JSON.stringify(result));
+
+    //the exec function must always return a promis of mongoose document
+    return result;
 }
-
-
-
-/**
- *
-    //Do we have any cached data in redis related to this query
-    //if yes, respond to  the request right away
-    if (cachedBlogs) {
-      console.log('SERVING FROM CACHE')
-      return res.send(JSON.parse(cachedBlogs))
-    }
-    //if no read from mongodb respond request
-    const blogs = await Blog.find({ _user: req.user.id });
-    console.log('SERVING FROM MONGDB')
-    res.send(blogs);
-    //and update cache
-    client.set(req.user.id, JSON.stringify(blogs));
-
-    //for deleting all entries in redis use the following command
-    //client.flushall()
- *
- *
- */

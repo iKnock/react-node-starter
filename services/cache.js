@@ -10,24 +10,45 @@ client.get = util.promisify(client.get);//we overwrite the exiting client.get wi
 //store reference to the original mongoose exec function (untoched copy of it)
 const exec = mongoose.Query.prototype.exec;
 
+//This is to create toggleable cache for every query, so every query inherit this method, so if this 
+//method is called on a query then that query is going to be cached
+mongoose.Query.prototype.cache = function () {
+    //this key word make the useCache property available for Query instance like exec in this case
+    //so that we can refer this.useCache down in the exec method
+    this.useCache = true;
+    return this;//this makes the function cache channable
+}
+
 //we add our logic in to the original function
 //notice the use of function key word not the arrow function. which is because we need
 //to use this key word, this in this case refer to Query object
 mongoose.Query.prototype.exec = async function () {
-    //this is used to safely copy properties from one object to the other and stringified to use for redis
+
+    console.log('starting of the exec function and the value of useCache==> ' + this.useCache)
+    if (!this.useCache) {
+        //if this.useCache is false skip the cache logic
+        return exec.apply(this, arguments);
+    }
+
+    //this is used to safely copy properties from one object to the other and stringified 
+    //to use for redis
     const key = JSON.stringify(Object.assign({}, this.getQuery(), {
         collection: this.mongooseCollection.name
     }));
 
     //See if we have a value for 'key' in redis
-
     const cacheValue = await client.get(key);
+    console.log('the key and value for the cached query ==> ' + key + '==' + cacheValue)
 
     //If yes do return the cachedValue
     //the exec function must always return a mongoose document (Model instances)
     if (cacheValue) {
-        const doc = new this.model(JSON.parse(cacheValue))
-        return doc;
+        //new this.model(JSON.parse(cacheValue)) this always expect json object. so to handle an array of json object we have to do 
+        const doc = JSON.parse(cacheValue);
+
+        return Array.isArray(doc)
+            ? doc.map(d => new this.model(d))
+            : new this.model(doc);
     }
 
     //otherwise, issue the query and store the result in redis

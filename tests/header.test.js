@@ -1,18 +1,38 @@
 const puppeteer = require('puppeteer');
 
-test('Adds two numbers', () => {
-    const sum = 1 + 2;
-    expect(sum).toEqual(3);
-});
+let browser, page;
 
-
-test('Launch a browser', async () => {
+//automatically invoked before each test executed inside this file
+beforeEach(async () => {
     //to launch browser object using puppeteer. which is always async 
-    const browser = await puppeteer.launch({
+    browser = await puppeteer.launch({
         headless: false, //to see the UI of the browser
-        executablePath: './node_modules/puppeteer/.local-chromium/win64-599821/chrome-win/chrome.exe',
+        executablePath: './node_modules/puppeteer/local-chromium/chrome-win/chrome.exe',
     });
 
     //to create a tab inside the browser we created
-    const page = await browser.newPage();
+    page = await browser.newPage();
+
+    //Navigate to app (put the protocol)
+    await page.goto('http://localhost:3000');
+})
+
+//invoked after each test inside this file is executed
+afterEach(async () => {
+    await browser.close();
+});
+
+test('Insure that the header has the correct text', async () => {
+    //Use DOM selector to retrive the content of an element from the page
+    const text = await page.$eval('a.brand-logo', el => el.innerHTML);//puppeteer serialize this code, send it to chromium and deserialize the response
+    //assert that the logo of the page is correct
+    expect(text).toEqual('Blogster')
+});
+
+test('Clicking login starts oauth flow', async () => {
+    await page.click('.right a');
+    const url = await page.url();
+    console.log(url)
+
+    expect(url).toMatch(/accounts\.google\.com/);
 })

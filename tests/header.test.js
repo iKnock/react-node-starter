@@ -49,10 +49,15 @@ test('When Signed In, show logout button', async () => {
 
     const sessionString = Buffer.from(JSON.stringify(sessionObject)).toString('base64');
 
+    //generating session string and session signature
     const Keygrip = require('keygrip');
     const keys = require('../config/keys');
     const keygrip = new Keygrip([keys.cookieKey]);
     const signature = keygrip.sign('session=' + sessionString);
+
+    //setting the session string and signature to cookies    
+    await page.setCookie({ name: 'session', value: sessionString });
+    await page.setCookie({ name: 'session.sig', value: signature });
 
     console.log(sessionString, signature);
 })

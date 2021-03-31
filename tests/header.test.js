@@ -19,7 +19,7 @@ beforeEach(async () => {
 
 //invoked after each test inside this file is executed
 afterEach(async () => {
-    await browser.close();
+    //await browser.close();
 });
 
 test('Insure that the header has the correct text', async () => {
@@ -38,7 +38,7 @@ test('Clicking login starts oauth flow', async () => {
 })
 
 
-test('When Signed In, show logout button', async () => {
+test.only('When Signed In, show logout button', async () => {
     const id = '6028325d272a9543607a8630';
     const Buffer = require('safe-buffer').Buffer;
     const sessionObject = {
@@ -58,6 +58,9 @@ test('When Signed In, show logout button', async () => {
     //setting the session string and signature to cookies    
     await page.setCookie({ name: 'session', value: sessionString });
     await page.setCookie({ name: 'session.sig', value: signature });
+
+    //refresh the page
+    await page.goto('http://localhost:3000');
 
     console.log(sessionString, signature);
 })

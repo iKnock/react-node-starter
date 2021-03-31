@@ -62,5 +62,10 @@ test.only('When Signed In, show logout button', async () => {
     //refresh the page
     await page.goto('http://localhost:3000');
 
-    console.log(sessionString, signature);
+    await page.waitFor('a[href="/auth/logout"]');
+
+    const text = await page.$eval('a[href="/auth/logout"]', el => el.innerHTML);
+
+    console.log(text);
+    expect(text).toEqual('Logout');
 })

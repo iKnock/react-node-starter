@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "jest": {
-    "setupTestFreamworkScriptFile": "./tests/setup.js"
+    "setupFilesAfterEnv": [
+      "./tests/setup.js"
+    ]
   },
   "scripts": {
     "start": "node index.js",

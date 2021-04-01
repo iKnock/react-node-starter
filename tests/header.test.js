@@ -19,7 +19,7 @@ beforeEach(async () => {
 
 //invoked after each test inside this file is executed
 afterEach(async () => {
-    //await browser.close();
+    await browser.close();
 });
 
 test('Insure that the header has the correct text', async () => {
@@ -38,22 +38,8 @@ test('Clicking login starts oauth flow', async () => {
 })
 
 
-test.only('When Signed In, show logout button', async () => {
+test('When Signed In, show logout button', async () => {
     const id = '6028325d272a9543607a8630';
-    const Buffer = require('safe-buffer').Buffer;
-    const sessionObject = {
-        passport: {
-            user: id
-        }
-    }
-
-    const sessionString = Buffer.from(JSON.stringify(sessionObject)).toString('base64');
-
-    //generating session string and session signature
-    const Keygrip = require('keygrip');
-    const keys = require('../config/keys');
-    const keygrip = new Keygrip([keys.cookieKey]);
-    const signature = keygrip.sign('session=' + sessionString);
 
     //setting the session string and signature to cookies    
     await page.setCookie({ name: 'session', value: sessionString });
@@ -61,11 +47,9 @@ test.only('When Signed In, show logout button', async () => {
 
     //refresh the page
     await page.goto('http://localhost:3000');
-
+    //wait until this element is loaded to dom
     await page.waitFor('a[href="/auth/logout"]');
-
     const text = await page.$eval('a[href="/auth/logout"]', el => el.innerHTML);
 
-    console.log(text);
     expect(text).toEqual('Logout');
 })

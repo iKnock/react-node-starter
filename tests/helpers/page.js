@@ -20,7 +20,8 @@ class CustomPage {
 
         return new Proxy(customPage, {
             get: function (target, property) {
-                return customPage[property] || page[property] || browser[property];
+                //the order of the call in the following line (i.e close function on both browser and page so FCFS)
+                return customPage[property] || browser[property] || page[property];
             }
         })
     }

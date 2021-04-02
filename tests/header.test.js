@@ -1,27 +1,20 @@
-const puppeteer = require('puppeteer');
 const sessionFactory = require('./factories/sessionFactory');
 const userFactory = require('./factories/userFactory')
+const Page = require('./helpers/page')
 
-let browser, page;
+let page;
 
 //automatically invoked before each test executed inside this file
 beforeEach(async () => {
-    //to launch browser object using puppeteer. which is always async 
-    browser = await puppeteer.launch({
-        headless: false, //to see the UI of the browser
-        executablePath: './node_modules/puppeteer/local-chromium/chrome-win/chrome.exe',
-    });
 
-    //to create a tab inside the browser we created
-    page = await browser.newPage();
-
+    page = await Page.build();
     //Navigate to app (put the protocol)
     await page.goto('http://localhost:3000');
 })
 
 //invoked after each test inside this file is executed
 afterEach(async () => {
-    await browser.close();
+    await page.close();
 });
 
 test('Insure that the header has the correct text', async () => {

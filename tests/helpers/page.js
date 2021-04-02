@@ -8,10 +8,13 @@ class CustomPage {
     //generate a new puppeteer page and instance of custome page, browser object and
     // combine the two with proxy 
     static async build() {
+        //to launch browser object using puppeteer. which is always async        
         const browser = await puppeteer.launch({
-            headless: false
-        })
+            headless: false, //to see the UI of the browser
+            executablePath: './node_modules/puppeteer/local-chromium/chrome-win/chrome.exe',
+        });
 
+        //to create a tab inside the browser we created
         const page = await browser.newPage();
         const customPage = new CustomPage(page);
 

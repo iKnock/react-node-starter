@@ -1,12 +1,10 @@
-const sessionFactory = require('./factories/sessionFactory');
-const userFactory = require('./factories/userFactory')
 const Page = require('./helpers/page')
 
 let page;
 
 //automatically invoked before each test executed inside this file
 beforeEach(async () => {
-
+    //page is the proxy object we created called CustomPage in the helper folder
     page = await Page.build();
     //Navigate to app (put the protocol)
     await page.goto('http://localhost:3000');
@@ -32,17 +30,8 @@ test('Clicking login starts oauth flow', async () => {
 })
 
 test('When Signed In, show logout button', async () => {
-    const user = await userFactory();
-    const { session, signature } = sessionFactory(user);
+    await page.login();
 
-    //setting the session string and signature to cookies    
-    await page.setCookie({ name: 'session', value: session });
-    await page.setCookie({ name: 'session.sig', value: signature });
-
-    //refresh the page
-    await page.goto('http://localhost:3000');
-    //wait until this element is loaded to dom
-    await page.waitFor('a[href="/auth/logout"]');
     const text = await page.$eval('a[href="/auth/logout"]', el => el.innerHTML);
 
     expect(text).toEqual('Logout');

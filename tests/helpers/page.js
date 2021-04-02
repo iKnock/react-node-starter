@@ -41,6 +41,10 @@ class CustomPage {
         //wait until this element is loaded to dom
         await this.page.waitFor('a[href="/auth/logout"]');
     }
+
+    async getContentsOf(selector) {
+        return this.page.$eval(selector, el => el.innerHTML);//puppeteer serialize this code, send it to chromium and deserialize the response
+    }
 }
 
 module.exports = CustomPage;

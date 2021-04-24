@@ -6,7 +6,8 @@
   "jest": {
     "setupFilesAfterEnv": [
       "./tests/setup.js"
-    ]
+    ],
+    "testEnvironment": "node"
   },
   "scripts": {
     "start": "node index.js",

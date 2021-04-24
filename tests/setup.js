@@ -1,4 +1,4 @@
-jest.setTimeout(30000);
+jest.setTimeout(30000);//wait 30 seconds before failing any test. which the default was 5 sec
 
 require('../models/User');
 

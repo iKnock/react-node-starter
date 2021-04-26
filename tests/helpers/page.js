@@ -46,6 +46,24 @@ class CustomPage {
         //puppeteer serialize this code, send it to chromium and deserialize the response
         return this.page.$eval(selector, el => el.innerHTML);
     }
+
+    get(path) {
+        return this.page.evaluate(_path => {
+            //_path is closur scope
+            return fetch(_path, {
+                method: 'GET',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => res.json());
+        }, path)
+    }
+
+    post(path, data) {
+
+    }
+
 }
 
 module.exports = CustomPage;

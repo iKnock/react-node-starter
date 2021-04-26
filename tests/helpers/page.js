@@ -12,7 +12,8 @@ class CustomPage {
     static async build() {
         //to launch browser object using puppeteer. which is always async        
         const browser = await puppeteer.launch({
-            headless: false, //to see the UI of the browser
+            headless: true, //to see the UI of the browser
+            args: ['no-sandbox'],
             executablePath: './node_modules/puppeteer/local-chromium/chrome-win/chrome.exe',
         });
 

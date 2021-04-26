@@ -1,10 +1,13 @@
 const mongoose = require('mongoose');
 const redis = require('redis');
 const util = require('util')//we used this to promisify, which takes any function that has callback and change it to promise
+const keys = require('../config/keys');
 
-const redisUrl = 'redis://127.0.0.1:6379'
-const client = redis.createClient(redisUrl)
-client.hget = util.promisify(client.hget);//we overwrite the exiting client.get with the promisified version
+//const redisUrl = 'redis://127.0.0.1:6379' // the local redis server
+
+const client = redis.createClient(keys.redisUrl)
+//we overwrite the exiting client.get with the promisified version
+client.hget = util.promisify(client.hget);
 
 
 //store reference to the original mongoose exec function (untoched copy of it)
@@ -13,7 +16,7 @@ const exec = mongoose.Query.prototype.exec;
 //This is to create toggleable cache for every query, so every query inherit this method, so if this 
 //method is called on a query then that query is going to be cached
 mongoose.Query.prototype.cache = function (options = {}) {
-    //this key word make the useCache property available for Query instance like exec in this case
+    //"this" key word make the useCache property available for Query instance like exec in this case
     //so that we can refer this.useCache down in the exec method
     this.useCache = true;
 

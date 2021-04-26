@@ -61,7 +61,16 @@ class CustomPage {
     }
 
     post(path, data) {
-
+        return this.page.evaluate((_path, _data) => {
+            return fetch(_path, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(_data)
+            }).then(res => res.json());
+        }, path, data)
     }
 
 }

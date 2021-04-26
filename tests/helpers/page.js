@@ -73,6 +73,16 @@ class CustomPage {
         }, path, data)
     }
 
+    execRequest(actions) {
+        //wait for the return of all the promise from actions map and make it to one single promise
+        return Promise.all(
+            actions.map(({ method, path, data }) => {
+                //If the get get method is called data will be undifined and get method will ignore the param
+                return this[method](path, data);
+            })
+        )
+    }
+
 }
 
 module.exports = CustomPage;

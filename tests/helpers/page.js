@@ -7,8 +7,8 @@ class CustomPage {
     constructor(page) {
         this.page = page;
     }
-    //generate a new puppeteer page and instance of custome page, browser object and
-    // combine the two with proxy 
+    //generate a new puppeteer page and instance of custome page, browser object 
+    // and combine the two with proxy 
     static async build() {
         //to launch browser object using puppeteer. which is always async        
         const browser = await puppeteer.launch({
